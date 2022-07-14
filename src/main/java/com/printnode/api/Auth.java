@@ -66,7 +66,7 @@ public class Auth implements Serializable {
      *
      * @return Credentials for APIClient.
      * @throws APIException if no credentials are set.
-     * @see APIClient
+     * @see PrintNodeClient
      * */
     public final String[] getCredentials() throws APIException {
         String[] credentials = new String[2];

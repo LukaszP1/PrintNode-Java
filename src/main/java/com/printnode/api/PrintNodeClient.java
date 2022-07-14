@@ -11,7 +11,10 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonWriter;
 import com.google.gson.stream.JsonReader;
 import java.io.IOException;
-import org.apache.http.HttpEntity;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.io.IOUtils;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.entity.StringEntity;
@@ -32,7 +35,7 @@ import org.apache.http.util.EntityUtils;
  * @author JakeTorrance
  * @author PrintNode
  * */
-public class APIClient {
+public class PrintNodeClient {
 
     /**
      * TypeAdapter for GSON. Converts ints of -1 to non-serialized values.
@@ -92,7 +95,7 @@ public class APIClient {
      * @param auth an Auth object which the APIClient will then save into a CredentialsProvider object.
      * @see Auth
      * */
-    public APIClient(final Auth auth) {
+    public PrintNodeClient(final Auth auth) {
         String[] credentialsArray = auth.getCredentials();
         credentials = new BasicCredentialsProvider();
         credentials.setCredentials(
@@ -427,10 +430,10 @@ public class APIClient {
      *
      * @param printjobinfo PrintJobJson object with values set.
      * @return id of printjob that was just created.
-     * @throws IOException if HTTP client is given bad values
+     * @throws PrintNodeException if HTTP client is given bad values
      * @see PrintJobJson
      * */
-    public final long createPrintJob(final PrintJobJson printjobinfo) throws IOException {
+    public final long createPrintJob(final PrintJobJson printjobinfo) throws PrintNodeException {
         CloseableHttpClient client = HttpClients.custom().setDefaultCredentialsProvider(credentials).build();
         long printjob;
         try {
@@ -448,8 +451,10 @@ public class APIClient {
             } finally {
                 response.close();
             }
+        } catch (IOException ex) {
+            throw new PrintNodeException("Cannot create printJob: " + ex.getMessage(), ex);
         } finally {
-            client.close();
+            IOUtils.closeQuietly(client);
         }
         return printjob;
     }
@@ -461,7 +466,7 @@ public class APIClient {
      * @see Whoami
      * @throws IOException if HTTP client is given bad values
      * */
-    public final Whoami getWhoami() throws IOException {
+    public final Whoami getWhoami() throws PrintNodeException {
         CloseableHttpClient client = HttpClients.custom().setDefaultCredentialsProvider(credentials).build();
         Whoami whoami;
         try {
@@ -474,8 +479,10 @@ public class APIClient {
             } finally {
                 response.close();
             }
+        } catch (IOException ex) {
+            throw new PrintNodeException("Cannot get printers: " + ex.getMessage(), ex);
         } finally {
-            client.close();
+            IOUtils.closeQuietly(client);
         }
         return whoami;
 
@@ -753,27 +760,29 @@ public class APIClient {
      *
      * @param printerSet set of printers.
      * @return Array of Printers.
-     * @throws IOException if HTTP client is given bad values
+     * @throws PrintNodeException if HTTP client is given bad values
      * @see Printer
      * */
-    public final Printer[] getPrinters(final String printerSet) throws IOException {
+    public final List<Printer> getPrinters(final String printerSet) throws PrintNodeException {
         CloseableHttpClient client = HttpClients.custom().setDefaultCredentialsProvider(credentials).build();
-        Printer[] printers;
+        List<Printer> printers;
         try {
             HttpGet httpget = new HttpGet(apiUrl + "/printers/" + printerSet);
             httpget.addHeader(childHeaders[0], childHeaders[1]);
             CloseableHttpResponse response = client.execute(httpget);
             try {
                 JsonArray responseParse = responseToJsonElement(response).getAsJsonArray();
-                printers = new Printer[responseParse.size()];
+                printers = new ArrayList(responseParse.size());
                 for (int i = 0; i < responseParse.size(); i++) {
-                    printers[i] = new Printer(responseParse.get(i).getAsJsonObject());
+                    printers.add(new Printer(responseParse.get(i).getAsJsonObject()));
                 }
             } finally {
                 response.close();
             }
+        } catch (IOException ex) {
+            throw new PrintNodeException("Cannot get printers: " + ex.getMessage(), ex);
         } finally {
-            client.close();
+            IOUtils.closeQuietly(client);
         }
         return printers;
 

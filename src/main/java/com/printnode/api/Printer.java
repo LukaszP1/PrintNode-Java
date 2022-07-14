@@ -37,7 +37,7 @@ public class Printer implements Serializable {
     /**
      * The default settings of this printer.
      * */
-    private String defaults;
+    private boolean defaults;
     /**
      * The date this printer was added to PrintNode.
      * */
@@ -80,7 +80,7 @@ public class Printer implements Serializable {
             capabilities = new Capabilities(response.get("capabilities").getAsJsonObject());
         }
         if (!response.get("default").isJsonNull()) {
-            defaults = response.get("default").getAsString();
+            defaults = response.get("default").getAsBoolean();
         }
         if (!response.get("createTimestamp").isJsonNull()) {
             createTimestamp = response.get("createTimestamp").getAsString();
@@ -131,7 +131,7 @@ public class Printer implements Serializable {
     /**
      * @return default settings for this printer.
      * */
-    public final String getDefault() {
+    public final boolean getDefault() {
         return defaults;
     }
 

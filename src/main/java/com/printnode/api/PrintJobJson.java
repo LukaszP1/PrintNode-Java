@@ -1,10 +1,8 @@
 package com.printnode.api;
 
-import java.io.IOException;
 import org.apache.commons.codec.binary.Base64;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+
+import java.net.URL;
 
 /**
  * An object to be serialized into JSON for creating printjobs.
@@ -49,33 +47,54 @@ public class PrintJobJson {
 
     /**
      * Creates an object to be serialized into JSON.
-     * Requires a contentType - if contentType is base_64, it is encoded into base64.
      *
-     * @param newPrinterId id of the printer which wil run the PrintJob.
-     * @param newTitle title of the PrintJob.
-     * @param newContentType Type of content. base64, uri, etc.
-     * @param newContent either a file, or a URL to a file. Depends on contentType.
-     * @param newSource Would be from the PrintNode-Java client.
-     * @throws IOException if "xxx_base64" is selected as content-type
-     * and the file specified in content does not exist.
-     * */
-    public PrintJobJson(final int newPrinterId,
-            final String newTitle,
-            final String newContentType,
-            final String newContent,
-            final String newSource) throws IOException {
-        printerId = newPrinterId;
-        title = newTitle;
-        contentType = newContentType;
-        if (contentType == "pdf_base64" || contentType == "raw_base64") {
-            Path filePath = Paths.get(newContent);
-            byte[] fileContent = Files.readAllBytes(filePath);
-            content = new String(Base64.encodeBase64(fileContent));
-        } else {
-            content = newContent;
-        }
-        source = newSource;
+     * @param printerId   id of the printer which wil run the PrintJob.
+     * @param title       title of the PrintJob.
+     * @param contentType Type of content. base64, uri, etc.
+     * @param content     either a file, or a URL to a file. Depends on contentType.
+     * @param source      A text description of how the print job was created or where the print job originated.
+     **/
+    private PrintJobJson(final int printerId,
+                         final String title,
+                         final String contentType,
+                         final String content,
+                         final String source) {
+        this.printerId = printerId;
+        this.title = title;
+        this.contentType = contentType;
+        this.content = content;
+        this.source = source;
         options = new Options();
+    }
+
+    /**
+     * Creates an object to be serialized into JSON.
+     *
+     * @param printerId id of the printer which wil run the PrintJob.
+     * @param title     title of the PrintJob.
+     * @param content   either a file, or a URL to a file. Depends on contentType.
+     * @param source    A text description of how the print job was created or where the print job originated.
+     **/
+    public static PrintJobJson ofPdfContent(final int printerId,
+                                            final String title,
+                                            final byte[] content,
+                                            final String source) {
+        return new PrintJobJson(printerId, title, "pdf_base64", new String(Base64.encodeBase64(content)), source);
+    }
+
+    /**
+     * Creates an object to be serialized into JSON.
+     *
+     * @param printerId id of the printer which wil run the PrintJob.
+     * @param title     title of the PrintJob.
+     * @param uri       content URI
+     * @param source    A text description of how the print job was created or where the print job originated.
+     **/
+    public static PrintJobJson ofPdfUri(final int printerId,
+                                        final String title,
+                                        final URL uri,
+                                        final String source) {
+        return new PrintJobJson(printerId, title, "pdf_uri", uri.toString(), source);
     }
 
     /**
