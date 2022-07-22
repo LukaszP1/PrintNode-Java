@@ -4,7 +4,7 @@
     <groupId>pl.nq.lb.printnode.client</groupId>
     <artifactId>printnode-client</artifactId>
     <packaging>jar</packaging>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>PrintNode Client</name>
     <url>https://github.com/LukaszP1/PrintNode-Java</url>
 
