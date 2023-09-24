@@ -1,5 +1,6 @@
 package com.printnode.api;
 
+import com.google.common.util.concurrent.RateLimiter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -36,6 +37,8 @@ import org.apache.http.util.EntityUtils;
  * @author PrintNode
  * */
 public class PrintNodeClient {
+
+    private RateLimiter rateLimiter = RateLimiter.create(10);
 
     /**
      * TypeAdapter for GSON. Converts ints of -1 to non-serialized values.
@@ -189,6 +192,7 @@ public class PrintNodeClient {
         try {
             HttpDelete httpdelete = new HttpDelete(apiUrl + "/account/apikey/" + description);
             httpdelete.addHeader(childHeaders[0], childHeaders[1]);
+            rateLimiter.acquire();
             CloseableHttpResponse response = client.execute(httpdelete);
             try {
                 JsonPrimitive responseParse = responseToJsonElement(response).getAsJsonPrimitive();
@@ -215,6 +219,7 @@ public class PrintNodeClient {
         try {
             HttpDelete httpdelete = new HttpDelete(apiUrl + "/account/tag/" + tagname);
             httpdelete.addHeader(childHeaders[0], childHeaders[1]);
+            rateLimiter.acquire();
             CloseableHttpResponse response = client.execute(httpdelete);
             try {
                 JsonPrimitive responseParse = responseToJsonElement(response).getAsJsonPrimitive();
@@ -243,6 +248,7 @@ public class PrintNodeClient {
         try {
             HttpDelete httpdelete = new HttpDelete(apiUrl + "/account/");
             httpdelete.addHeader(childHeaders[0], childHeaders[1]);
+            rateLimiter.acquire();
             CloseableHttpResponse response = client.execute(httpdelete);
             try {
                 JsonPrimitive responseParse = responseToJsonElement(response).getAsJsonPrimitive();
@@ -279,6 +285,7 @@ public class PrintNodeClient {
             String json = gson.toJson(jObject);
             StringEntity jsonEntity = new StringEntity(json);
             httppost.setEntity(jsonEntity);
+            rateLimiter.acquire();
             CloseableHttpResponse response = client.execute(httppost);
             try {
                 JsonArray responseParse = responseToJsonElement(response).getAsJsonArray();
@@ -317,6 +324,7 @@ public class PrintNodeClient {
             String json = gson.toJson(accountInfo);
             StringEntity jsonEntity = new StringEntity(json);
             httppost.setEntity(jsonEntity);
+            rateLimiter.acquire();
             CloseableHttpResponse response = client.execute(httppost);
             try {
                 JsonObject responseParse = responseToJsonElement(response).getAsJsonObject();
@@ -349,6 +357,7 @@ public class PrintNodeClient {
             String json = gson.toJson(tagValue);
             StringEntity jsonEntity = new StringEntity(json);
             httppost.setEntity(jsonEntity);
+            rateLimiter.acquire();
             CloseableHttpResponse response = client.execute(httppost);
             try {
                 String responseParse = responseToJsonElement(response).getAsString();
@@ -377,6 +386,7 @@ public class PrintNodeClient {
         try {
             HttpPost httppost = new HttpPost(apiUrl + "/account/apikey/" + description);
             httppost.addHeader(childHeaders[0], childHeaders[1]);
+            rateLimiter.acquire();
             CloseableHttpResponse response = client.execute(httppost);
             try {
                 String responseParse = responseToJsonElement(response).getAsString();
@@ -412,6 +422,7 @@ public class PrintNodeClient {
             String json = gson.toJson(accountInfo);
             StringEntity jsonEntity = new StringEntity(json);
             httppost.setEntity(jsonEntity);
+            rateLimiter.acquire();
             CloseableHttpResponse response = client.execute(httppost);
             try {
                 JsonObject responseParse = responseToJsonElement(response).getAsJsonObject();
@@ -444,6 +455,7 @@ public class PrintNodeClient {
             String json = gson.toJson(printjobinfo);
             StringEntity jsonEntity = new StringEntity(json);
             httppost.setEntity(jsonEntity);
+            rateLimiter.acquire();
             CloseableHttpResponse response = client.execute(httppost);
             try {
                 long responseParse = responseToJsonElement(response).getAsLong();
@@ -472,6 +484,7 @@ public class PrintNodeClient {
         try {
             HttpGet httpget = new HttpGet(apiUrl + "/whoami/");
             httpget.addHeader(childHeaders[0], childHeaders[1]);
+            rateLimiter.acquire();
             CloseableHttpResponse response = client.execute(httpget);
             try {
                 JsonObject responseParse = responseToJsonElement(response).getAsJsonObject();
@@ -507,6 +520,7 @@ public class PrintNodeClient {
         try {
             HttpGet httpget = new HttpGet(apiUrl + "/download/client/" + os);
             httpget.addHeader(childHeaders[0], childHeaders[1]);
+            rateLimiter.acquire();
             CloseableHttpResponse response = client.execute(httpget);
             try {
                 JsonObject responseParse = responseToJsonElement(response).getAsJsonObject();
@@ -537,6 +551,7 @@ public class PrintNodeClient {
         try {
             HttpGet httpget = new HttpGet(apiUrl + "/download/clients/" + clientSet);
             httpget.addHeader(childHeaders[0], childHeaders[1]);
+            rateLimiter.acquire();
             CloseableHttpResponse response = client.execute(httpget);
             try {
                 JsonArray responseParse = responseToJsonElement(response).getAsJsonArray();
@@ -568,6 +583,7 @@ public class PrintNodeClient {
         try {
             HttpGet httpget = new HttpGet(apiUrl + "/computers/" + computerSet);
             httpget.addHeader(childHeaders[0], childHeaders[1]);
+            rateLimiter.acquire();
             CloseableHttpResponse response = client.execute(httpget);
             try {
                 JsonArray responseParse = responseToJsonElement(response).getAsJsonArray();
@@ -605,6 +621,7 @@ public class PrintNodeClient {
             }
             HttpGet httpget = new HttpGet(endPointUrl);
             httpget.addHeader(childHeaders[0], childHeaders[1]);
+            rateLimiter.acquire();
             CloseableHttpResponse response = client.execute(httpget);
             try {
                 JsonArray responseParse = responseToJsonElement(response).getAsJsonArray();
@@ -643,6 +660,7 @@ public class PrintNodeClient {
         try {
             HttpGet httpget = new HttpGet(apiUrl + "/printers/" + printerSet + "/printjobs/" + printJobSet);
             httpget.addHeader(childHeaders[0], childHeaders[1]);
+            rateLimiter.acquire();
             CloseableHttpResponse response = client.execute(httpget);
             try {
                 JsonArray responseParse = responseToJsonElement(response).getAsJsonArray();
@@ -674,6 +692,7 @@ public class PrintNodeClient {
         try {
             HttpGet httpget = new HttpGet(apiUrl + "/printjobs/" + printJobSet);
             httpget.addHeader(childHeaders[0], childHeaders[1]);
+            rateLimiter.acquire();
             CloseableHttpResponse response = client.execute(httpget);
             try {
                 JsonArray responseParse = responseToJsonElement(response).getAsJsonArray();
@@ -708,6 +727,7 @@ public class PrintNodeClient {
         try {
             HttpGet httpget = new HttpGet(apiUrl + "/computers/" + computerSet + "/printers/" + printerSet);
             httpget.addHeader(childHeaders[0], childHeaders[1]);
+            rateLimiter.acquire();
             CloseableHttpResponse response = client.execute(httpget);
             try {
                 JsonArray responseParse = responseToJsonElement(response).getAsJsonArray();
@@ -739,6 +759,7 @@ public class PrintNodeClient {
         try {
             HttpGet httpget = new HttpGet(apiUrl + "/computer/" + computerId + "/scales/");
             httpget.addHeader(childHeaders[0], childHeaders[1]);
+            rateLimiter.acquire();
             CloseableHttpResponse response = client.execute(httpget);
             try {
                 JsonArray responseParse = responseToJsonElement(response).getAsJsonArray();
@@ -769,6 +790,7 @@ public class PrintNodeClient {
         try {
             HttpGet httpget = new HttpGet(apiUrl + "/printers/" + printerSet);
             httpget.addHeader(childHeaders[0], childHeaders[1]);
+            rateLimiter.acquire();
             CloseableHttpResponse response = client.execute(httpget);
             try {
                 JsonArray responseParse = responseToJsonElement(response).getAsJsonArray();
@@ -811,6 +833,7 @@ public class PrintNodeClient {
                     + "&version="
                     + version);
             httpget.addHeader(childHeaders[0], childHeaders[1]);
+            rateLimiter.acquire();
             CloseableHttpResponse response = client.execute(httpget);
             try {
                 String responseParse = responseToJsonElement(response).getAsString();
@@ -837,6 +860,7 @@ public class PrintNodeClient {
         try {
             HttpGet httpget = new HttpGet(apiUrl + "/account/apikey/" + apikey);
             httpget.addHeader(childHeaders[0], childHeaders[1]);
+            rateLimiter.acquire();
             CloseableHttpResponse response = client.execute(httpget);
             try {
                 String responseParse = responseToJsonElement(response).getAsString();
@@ -864,6 +888,7 @@ public class PrintNodeClient {
         try {
             HttpGet httpget = new HttpGet(apiUrl + "/account/tag/" + tagName);
             httpget.addHeader(childHeaders[0], childHeaders[1]);
+            rateLimiter.acquire();
             CloseableHttpResponse response = client.execute(httpget);
             try {
                 String responseParse = responseToJsonElement(response).getAsString();

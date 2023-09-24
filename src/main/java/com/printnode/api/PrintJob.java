@@ -17,7 +17,7 @@ public class PrintJob implements Serializable {
     /**
      * The ID of this PrintJob.
      * */
-    private int id;
+    private long id;
     /**
      * The Printer that relates to this PrintJob.
      * */
@@ -64,7 +64,7 @@ public class PrintJob implements Serializable {
      * */
     public PrintJob(final JsonObject response) {
         if (!response.get("id").isJsonNull()) {
-            id = response.get("id").getAsInt();
+            id = response.get("id").getAsLong();
         }
         if (!response.get("printer").isJsonNull()) {
             printer = new Printer(response.get("printer").getAsJsonObject());
@@ -93,7 +93,7 @@ public class PrintJob implements Serializable {
     /**
      * @return id of this PrintJob.
      * */
-    public final int getId() {
+    public final long getId() {
         return id;
     }
 

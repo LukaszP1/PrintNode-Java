@@ -2,3 +2,4 @@ build/
 target/
 tmp/
 /.idea/
+/printnode-client.iml
