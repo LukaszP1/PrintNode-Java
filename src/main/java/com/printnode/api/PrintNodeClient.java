@@ -38,8 +38,6 @@ import org.apache.http.util.EntityUtils;
  * */
 public class PrintNodeClient {
 
-    private RateLimiter rateLimiter = RateLimiter.create(10);
-
     /**
      * TypeAdapter for GSON. Converts ints of -1 to non-serialized values.
      *
@@ -92,6 +90,8 @@ public class PrintNodeClient {
      * */
     private CredentialsProvider credentials;
 
+    private final RateLimiter rateLimiter;
+
     /**
      * default constructor for the APIClient.
      *
@@ -99,6 +99,17 @@ public class PrintNodeClient {
      * @see Auth
      * */
     public PrintNodeClient(final Auth auth) {
+        this(auth, 5);
+    }
+
+    /**
+     * default constructor for the APIClient.
+     *
+     * @param auth an Auth object which the APIClient will then save into a CredentialsProvider object.
+     * @param maxRequestsPerSecond maximum requests number per second to rate limits
+     * @see Auth
+     * */
+    public PrintNodeClient(final Auth auth, int maxRequestsPerSecond) {
         String[] credentialsArray = auth.getCredentials();
         credentials = new BasicCredentialsProvider();
         credentials.setCredentials(
@@ -107,7 +118,7 @@ public class PrintNodeClient {
                 );
         childHeaders[0] = "";
         childHeaders[1] = "";
-
+        this.rateLimiter = RateLimiter.create(maxRequestsPerSecond);
     }
 
     /**
